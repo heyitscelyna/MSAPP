@@ -1,0 +1,53 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+
+  <head>
+    <title>Management System</title>
+  </head>
+
+<style>
+  body{
+    background-image: linear-gradient(to right top, #6b0e0e, #530d14, #3a0d15, #220b0f, #000000);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+</style>
+
+<body>
+  <form method="post">
+    {%csrf_token%}
+    <div class="col-md-12 mt-4 mb-2" style="text-align: left;">
+      <h1><a href="{% url 'msApp:logins' %}" class="nav_link"> <span class="nav_name">Login for Employee</span> </a></h1>
+      <div>
+      </div>
+      <h1><a href="{% url 'msApp:logina' %}" class="nav_link"> <span class="nav_name">Login for Admin</span> </a><h1>
+    <div>
+    <div class="col-md-12 mt-4 mb-2" style="text-align: center;">
+      <br/><br/><br/>
+      <br/><br/><br/>
+      <br/><br/><br/>
+
+      {% if mes_name%}
+      <center>
+        <h3> Thanks {{mes_name}}!</h3>
+        <p> We will received your email and will respond shortly...</p>
+      </center>
+      {%else%}
+    <div>
+      <h3>Contact us here:</h3>
+    </div>
+          <form action="/index">
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" placeholder="Your name.." style="height:50px"></textarea>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" placeholder="Your email.." style="height:50px"></textarea>
+            <label for="message">Message:</label>
+            <input type="message" name="message" placeholder="Write something.." style="height:50px"></textarea>
+            <input type="submit" value="Submit">
+          </form>
+      {%endif%}
+    </form>
+  </body>
+</html>

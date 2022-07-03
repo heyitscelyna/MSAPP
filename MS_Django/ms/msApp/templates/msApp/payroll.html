@@ -1,0 +1,151 @@
+{% load static %}
+<!DOCTYPE html> 
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="{%static 'css/styles.css' %}">
+  <title>Management System</title>
+</head>
+
+<body id="body-pd" class="bg-light">
+  <header class="header" id="header">
+    <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
+  </header>
+  <div class="l-navbar" id="nav-bar">
+    <nav class="nav">
+      <div>
+        <a href="{% url 'msApp:homepage' %}" class="nav_logo"> <i class='bx bx-layer nav_logo-icon'></i> <span class="nav_logo-name">Management <br> System</span> </a>
+        <div class="nav_list">
+            <a href="{% url 'msApp:homepage' %}" class="nav_link"> <i class='bx bx-home-alt nav_icon'></i> <span class="nav_name">Home</span> </a>
+            <a href="{% url 'msApp:payroll' %}" class="nav_link active"> <i class='bx bx-note nav_icon'></i> <span class="nav_name">Payroll List</span> </a>
+            <a href="{% url 'msApp:employee' %}" class="nav_link"> <i class='bx bx-user-pin nav_icon'></i> <span class="nav_name">Employee List</span> </a>
+            <a href="{% url 'msApp:users' %}" class="nav_link"> <i class='bx bx-user nav_icon'></i> <span class="nav_name">Users List</span> </a>
+            <a href="{% url 'msApp:admin' %}" class="nav_link"> <i class='bx bx-user-circle nav_icon'></i> <span class="nav_name">Admin List</span> </a>
+
+          </div>
+      </div>
+      <a href="{% url 'msApp:logout' %}" class="nav_link"> <i class='bx bx-log-out nav_icon'></i> <span class="nav_name">Log out</span> </a>
+    </nav>
+  </div>
+
+  <!--Container Main start-->
+<div class="height-100">
+  <div class="row">
+    <div class="col-md">
+      <h1><b>Management System Payroll</b></h1>
+    </div>
+    <div class="col-md clock">
+      <span id="LiveTime" class="badge bg-warning text-dark" style="font-size: 20px;"></span>
+    </div>
+  </div>
+
+  <!-- TABLE PAYROLL -->
+  <div class="mt-5">
+    <div class="row">
+      <div class="col-lg-7">
+        <h4 class="mt-1 mb-1">Payroll List</h4>
+      </div>
+      <div class="col-lg-5" style="display: inline-flex;">
+        <input type="text" class="form-control" id="searchPayroll" onkeyup="searchPayroll()" placeholder="Search name...">
+        <span class="input-group-text bg-danger text-white"><i class='bx bx-search-alt-2 nav_logo-icon'></i></span>
+      </div>
+    </div>
+    <div class="tableData overflow-auto">
+      <table class="table mt-4 table-hover" id="myTableP">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Total</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in payroll %} 
+            <tr>
+              <td>{{ p.employee }}</td>
+              <td>P {{ p.total }}</td>
+              <td><button type="button" data-bs-toggle="modal" class="btn btn-danger" data-bs-target="#modalView{{ p.id }}">View</button></td>
+            </tr>
+
+            <!-- MODAL VIEW -->
+            <div class="modal fade" id="modalView{{ p.id }}" tabindex="-1" role="dialog" aria-labelledby="modalDelete" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Salary Slip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body text-center">
+                      <form action="{% url 'msApp:pdf_generator' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" value="name" name="APname">
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeId" value="Employee I.D: {{ p.id }}" readonly>
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeName" value="Employee: {{ p.employee }}" readonly>
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeDate" value="Release Date: {{ p.dates }}" readonly>
+                        <p>-------------------------------------------------------</p>
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeTime" value="Worked Hour/Day: {{ p.totalrecord }}" readonly>
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeDeduction" value="Deduction: 0" readonly>
+                        <input class="text-center" style="border: none; font-size: 25px" name="employeeTotal" value="Total Salary: P{{ p.total }}" readonly>
+                        <br><br>
+                        <button type="submit" id="savePdf" class="btn btn-danger" >Save as Pdf</button>
+                      </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            
+            {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="no-result-div mt-4 text-center" id="no-searchP">
+        <div class="div">
+          <img src="{%static 'images/search.svg'%}" alt="">
+          <h4 class="mt-3">Search not found...</h4>
+          <p>Search for fullnames, usernames, emails and etc.</p>
+        </div>
+      </div>
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/app.js' %}"></script>
+  <script src="{% static 'js/search.js' %}"></script>
+  <script src="{% static 'js/jspdf.min.js' %}"></script>
+  <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+  {% for message in messages %}
+  <script>
+      swal("{{message}}","");
+  </script>
+  {% endfor %}
+
+  <!-- <script>
+    $(document).ready(function(){
+      $('#savePdf').click(function genPDF() {
+        a1 = $('#employeeId').val()
+        a2 = $('#employeeName').val()
+        a3 = $('#employeeDate').val()
+        a4 = $('#employeeTime').val()
+        a5 = $('#employeeDeduction').val()
+        a6 = $('#employeeTotal').val()
+        var doc = new jsPDF();
+        doc.text(80, 20, "Payroll Details:");
+        doc.text(20, 40, a1);
+        doc.text(20, 50, a2);
+        doc.text(20, 60, a3);
+        doc.text(20, 70, a4);
+        doc.text(20, 80, a5);
+        doc.text(20, 90, a6);
+        doc.save('Payroll data for : ' + a2 + '.pdf');
+      })
+    }) -->
+  </script>
+</body>
+
+</html>
